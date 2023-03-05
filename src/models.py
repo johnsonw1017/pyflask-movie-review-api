@@ -65,8 +65,9 @@ class List(db.Model):
     #primary key
     id = db.Column(db.Integer, primary_key=True)
     #other attributes
-    title = db.Column(db.String())
-    publish_date = db.Column(db.Date())
+    title = db.Column(db.String(), nullable=False)
+    publish_date = db.Column(db.Date(), nullable=False)
+    private = db.Column(db.Boolean, default=False)
     #foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     # one-to-many relationships to other models, include back reference
