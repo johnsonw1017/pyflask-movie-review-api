@@ -2,3 +2,7 @@ Database connection
 - sudo -u postgres psql
 - create database and user db_dev
 - connect to database as db_dev - \c movie_review_db db_dev;
+
+Model creation
+- as a database object  - class Movie(db.Model):
+- define table name, primary keys and other attributes
