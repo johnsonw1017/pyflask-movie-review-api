@@ -24,6 +24,12 @@ class Movie(db.Model):
   release_date = db.Column(db.Date())
   genre = db.Column(db.String()) #this depends whether this data is available
 
+#cli commands for the app
+@app.cli.command("create")
+def create_db():
+  db.create_all()
+  print("Table created")
+
 @app.route("/")
 def hello():
   return "Hello World!"

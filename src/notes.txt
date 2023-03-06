@@ -6,3 +6,9 @@ Database connection
 Model creation
 - as a database object  - class Movie(db.Model):
 - define table name, primary keys and other attributes
+
+cli commands
+- PostgreSQL 15 update: need to grant schema public privilege to user (db_dev)
+- create 
+- seed 
+- delete
