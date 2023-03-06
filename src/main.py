@@ -15,4 +15,10 @@ def create_app():
     #create database object
     db.init_app(app)
 
+    #import controllers and register blueprint
+    from controllers import registerable_controllers
+
+    for controller in registerable_controllers:
+        app.register_blueprint(controller)
+
     return app

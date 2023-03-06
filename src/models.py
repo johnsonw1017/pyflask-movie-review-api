@@ -7,8 +7,10 @@ class User(db.Model):
     #primary key
     id = db.Column(db.Integer, primary_key=True)
     #other attributes
+    email = db.Column(db.String(), nullable=False, unique=True)
+    password = db.Column(db.String(), nullable=False)
+    admin = db.Column(db.Boolean(), default=False)
     user_name = db.Column(db.String(30), nullable=False)
-    join_date = db.Column(db.Date(), nullable=False)
 
     # one-to-many relationships to other models, include back reference
     reviews = db.relationship('Review', backref='user')
