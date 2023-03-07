@@ -13,3 +13,5 @@ cli commands
 - seed - realised movie dataset doesnt have director in a good format and genre is not singular (may have create another table)
  date format "YYYY-MM-DD"
 - delete
+
+Marshmallow - serialise data in json format via schemas 

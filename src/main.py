@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from marshmallow.validate import Length
 
 app = Flask(__name__)
 ma = Marshmallow(app)
@@ -37,6 +38,33 @@ movie_schema = MovieSchema()
 
 #for multiple cards retrieval
 movies_schema = MovieSchema(many=True)
+
+class User(db.Model):
+  __tablename__ = "USERS"
+
+  #primary key
+  id = db.Column(db.Integer, primary_key=True)
+
+  #other attributes
+  name = db.Column(db.String(), nullable=False)
+  email = db.Column(db.String(), nullable=False, unique=True)
+  password = db.Column(db.String(), nullable=False)
+  admin = db.Column(db.Boolean(), default=False)
+  join_date = db.Column(db.Date())
+
+class UserSchema(ma.Schema):
+  class Meta:
+    #fields that would be exposed
+    fields = ("name", "join_date")
+    model = User
+  #validate password length  
+  password = ma.String(validate=Length(min=6))
+    
+#for one card retrieval 
+user_schema = UserSchema()
+
+#for multiple cards retrieval
+users_schema = UserSchema(many=True)
 
 #cli commands for the app
 @app.cli.command("create")
