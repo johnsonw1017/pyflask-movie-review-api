@@ -2,9 +2,11 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow.validate import Length
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
 
 #database URI via SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://db_dev:123456@localhost:5432/movie_review_db"
@@ -92,7 +94,7 @@ def seed_db():
   admin_user = User(
     name = "Johnson Wang",
     email = "admin@email.com",
-    password = "123456",
+    password = bcrypt.generate_password_hash("123456").decode("utf-8"),
     admin = True,
     join_date = date.today()
   )
@@ -100,7 +102,7 @@ def seed_db():
   user1 = User(
     name = "Lumberjack Williams",
     email = "user1@email.com",
-    password = "123456",
+    password = bcrypt.generate_password_hash("654321").decode("utf-8"),
     join_date = date.today()
   )
 
