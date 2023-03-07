@@ -74,7 +74,7 @@ def create_db():
 
 @app.cli.command("seed")
 def seed_db():
-  
+  from datetime import date
   movie1 = Movie(
     title = "Toy Story",
     description = "Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstances separate Buzz and Woody from their owner, the duo eventually learns to put aside their differences.",
@@ -89,8 +89,25 @@ def seed_db():
     run_time = 104,
   )
 
+  admin_user = User(
+    name = "Johnson Wang",
+    email = "admin@email.com",
+    password = "123456",
+    admin = True,
+    join_date = date.today()
+  )
+
+  user1 = User(
+    name = "Lumberjack Williams",
+    email = "user1@email.com",
+    password = "123456",
+    join_date = date.today()
+  )
+
   db.session.add(movie1)
   db.session.add(movie2)
+  db.session.add(admin_user)
+  db.session.add(user1)
   db.session.commit()
 
   print("Table seeded")

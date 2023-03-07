@@ -15,3 +15,7 @@ cli commands
 - delete
 
 Marshmallow - serialise data in json format via schemas 
+
+Authentication
+-create user model
+-user schema include limit on password
