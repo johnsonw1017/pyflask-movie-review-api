@@ -1,7 +1,10 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
+ma = Marshmallow(app)
+
 #database URI via SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://db_dev:123456@localhost:5432/movie_review_db"
 
@@ -20,9 +23,20 @@ class Movie(db.Model):
   #other attributes
   title = db.Column(db.String())
   description = db.Column(db.String())
-  director = db.Column(db.String())
   release_date = db.Column(db.Date())
-  genre = db.Column(db.String()) #this depends whether this data is available
+  run_time = db.Column(db.Integer())
+  #genre = db.Column(db.String()) #depends whether can integrate from csv
+
+class MovieSchema(ma.Schema):
+  class Meta:
+    #fields that would be exposed
+    fields = ("title", "description", "release_date", "run_time")
+
+#for one card retrieval 
+movie_schema = MovieSchema()
+
+#for multiple cards retrieval
+movies_schema = MovieSchema(many=True)
 
 #cli commands for the app
 @app.cli.command("create")
@@ -30,6 +44,40 @@ def create_db():
   db.create_all()
   print("Table created")
 
-@app.route("/")
-def hello():
-  return "Hello World!"
+@app.cli.command("seed")
+def seed_db():
+  
+  movie1 = Movie(
+    title = "Toy Story",
+    description = "Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstances separate Buzz and Woody from their owner, the duo eventually learns to put aside their differences.",
+    release_date = "1995-10-30",
+    run_time = 81,
+  )
+
+  movie2 = Movie(
+    title = "Jumanji",
+    description = "When siblings Judy and Peter discover an enchanted board game that opens the door to a magical world, they unwittingly invite Alan -- an adult who's been trapped inside the game for 26 years -- into their living room. Alan's only hope for freedom is to finish the game, which proves risky as all three find themselves running from giant rhinoceroses, evil monkeys and other terrifying creatures.",
+    release_date = "1995-12-15",
+    run_time = 104,
+  )
+
+  db.session.add(movie1)
+  db.session.add(movie2)
+  db.session.commit()
+
+  print("Table seeded")
+
+@app.cli.command("drop")
+def drop_db():
+    db.drop_all()
+    print("Tables dropped") 
+
+@app.route("/movies", methods=["GET"])
+def get_movies():
+  
+  #get ALL movies from database table *change for final
+  movies_list = Movie.query.all()
+  #conversion to json format
+  result = movies_schema.dump(movies_list)
+
+  return jsonify(result)

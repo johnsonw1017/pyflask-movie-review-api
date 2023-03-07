@@ -10,5 +10,6 @@ Model creation
 cli commands
 - PostgreSQL 15 update: need to grant schema public privilege to user (db_dev)
 - create 
-- seed 
+- seed - realised movie dataset doesnt have director in a good format and genre is not singular (may have create another table)
+ date format "YYYY-MM-DD"
 - delete
