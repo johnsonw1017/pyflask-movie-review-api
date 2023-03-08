@@ -6,18 +6,19 @@ from flask_bcrypt import Bcrypt
 from datetime import date, timedelta
 from flask_jwt_extended import JWTManager, create_access_token
 
-app = Flask(__name__)
+def create_app():
+  app = Flask(__name__)
+  # configure from config.py  
+  app.config.from_object("config.app_config")
+  db = SQLAlchemy(app)
+  return app
+
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-#database URI via SQLAlchemy
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://db_dev:123456@localhost:5432/movie_review_db"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = "you got this"
-
 #database object
-db = SQLAlchemy(app)
+
 
 #create database object Movie
 
@@ -146,6 +147,7 @@ def auth_register():
   user.name = user_fields["name"]
   user.email = user_fields["email"]
   user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+  user.admin = False
   user.join_date = date.today()
 
   #add to database and commit change
