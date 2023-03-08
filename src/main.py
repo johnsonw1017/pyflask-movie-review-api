@@ -6,35 +6,21 @@ from flask_bcrypt import Bcrypt
 from datetime import date, timedelta
 from flask_jwt_extended import JWTManager, create_access_token
 
+db = SQLAlchemy()
+
 def create_app():
   app = Flask(__name__)
   # configure from config.py  
-  app.config.from_object("config.app_config")
-  db = SQLAlchemy(app)
+  app.config.from_object("config.app_config") #change to app_config_testing for testing mode
+  
+  #database object
+  db.init_app(app)
+
   return app
 
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-
-#database object
-
-
-#create database object Movie
-
-class Movie(db.Model):
-  #table name of db
-  __tablename__ = "MOVIES"
-
-  #primary key
-  id = db.Column(db.Integer, primary_key=True)
-
-  #other attributes
-  title = db.Column(db.String())
-  description = db.Column(db.String())
-  release_date = db.Column(db.Date())
-  run_time = db.Column(db.Integer())
-  #genre = db.Column(db.String()) #depends whether can integrate from csv
 
 class MovieSchema(ma.Schema):
   class Meta:
@@ -46,19 +32,6 @@ movie_schema = MovieSchema()
 
 #for multiple cards retrieval
 movies_schema = MovieSchema(many=True)
-
-class User(db.Model):
-  __tablename__ = "USERS"
-
-  #primary key
-  id = db.Column(db.Integer, primary_key=True)
-
-  #other attributes
-  name = db.Column(db.String())
-  email = db.Column(db.String(), nullable=False, unique=True)
-  password = db.Column(db.String(), nullable=False)
-  admin = db.Column(db.Boolean(), default=False)
-  join_date = db.Column(db.Date())
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
   class Meta:
