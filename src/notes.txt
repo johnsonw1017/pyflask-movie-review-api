@@ -1,5 +1,5 @@
 Database connection
-- sudo -u postgres psql
+- sudo -u postgres psql psql -U johns  -d postgres
 - create database and user db_dev
 - connect to database as db_dev - \c movie_review_db db_dev;
 

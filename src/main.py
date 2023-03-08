@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow.validate import Length
 from flask_bcrypt import Bcrypt
+from datetime import date
 
 app = Flask(__name__)
 ma = Marshmallow(app)
@@ -10,6 +11,8 @@ bcrypt = Bcrypt(app)
 
 #database URI via SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://db_dev:123456@localhost:5432/movie_review_db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'your_secret_key'
 
 #database object
 db = SQLAlchemy(app)
@@ -52,12 +55,10 @@ class User(db.Model):
   email = db.Column(db.String(), nullable=False, unique=True)
   password = db.Column(db.String(), nullable=False)
   admin = db.Column(db.Boolean(), default=False)
-  join_date = db.Column(db.Date())
+  #join_date = db.Column(db.Date())
 
-class UserSchema(ma.Schema):
+class UserSchema(ma.SQLAlchemyAutoSchema):
   class Meta:
-    #fields that would be exposed
-    fields = ("name", "join_date")
     model = User
   #validate password length  
   password = ma.String(validate=Length(min=6))
@@ -76,7 +77,6 @@ def create_db():
 
 @app.cli.command("seed")
 def seed_db():
-  from datetime import date
   movie1 = Movie(
     title = "Toy Story",
     description = "Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstances separate Buzz and Woody from their owner, the duo eventually learns to put aside their differences.",
@@ -96,14 +96,14 @@ def seed_db():
     email = "admin@email.com",
     password = bcrypt.generate_password_hash("123456").decode("utf-8"),
     admin = True,
-    join_date = date.today()
+    #join_date = date.today()
   )
 
   user1 = User(
     name = "Lumberjack Williams",
     email = "user1@email.com",
     password = bcrypt.generate_password_hash("654321").decode("utf-8"),
-    join_date = date.today()
+    #join_date = date.today()
   )
 
   db.session.add(movie1)
@@ -128,3 +128,19 @@ def get_movies():
   result = movies_schema.dump(movies_list)
 
   return jsonify(result)
+
+@app.route("/auth", methods=["POST"])
+def auth_register():
+  #request data loaded in user_schema
+  user_fields = user_schema.load(request.json)
+
+  user = User()
+  user.name = user_fields["name"]
+  user.email = user_fields["email"]
+  user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+
+  #add to database and commit change
+  db.session.add(user)
+  db.session.commit()
+
+  return jsonify(user_schema.dump(user))
