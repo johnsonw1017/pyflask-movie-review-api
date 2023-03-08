@@ -3,16 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow.validate import Length
 from flask_bcrypt import Bcrypt
-from datetime import date
+from datetime import date, timedelta
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 #database URI via SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://db_dev:123456@localhost:5432/movie_review_db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['JWT_SECRET_KEY'] = "you got this"
 
 #database object
 db = SQLAlchemy(app)
@@ -51,7 +53,7 @@ class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   #other attributes
-  name = db.Column(db.String(), nullable=False)
+  name = db.Column(db.String())
   email = db.Column(db.String(), nullable=False, unique=True)
   password = db.Column(db.String(), nullable=False)
   admin = db.Column(db.Boolean(), default=False)
@@ -149,5 +151,26 @@ def auth_register():
   #add to database and commit change
   db.session.add(user)
   db.session.commit()
+  #create access token with 1 day expiry
+  expiry = timedelta(days=1)
+  access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
+    
+  return jsonify({"user": user.email, "token": access_token})
 
-  return jsonify(user_schema.dump(user))
+@app.route("/auth/login", methods=["POST"])
+def auth_login():
+    #get the user data from the request
+    user_fields = user_schema.load(request.json)
+
+    #check if email exists
+    user = User.query.filter_by(email=user_fields["email"]).first()
+
+    # error if user not exist or password incorrect
+    if not user or not bcrypt.check_password_hash(user.password, user_fields["password"]):
+        return abort(401, description="Incorrect username and password")
+    
+    #create access token with 1 day expiry
+    expiry = timedelta(days=1)
+    access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
+    
+    return jsonify({"user": user.email, "token": access_token})
