@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow.validate import Length
@@ -55,7 +55,7 @@ class User(db.Model):
   email = db.Column(db.String(), nullable=False, unique=True)
   password = db.Column(db.String(), nullable=False)
   admin = db.Column(db.Boolean(), default=False)
-  #join_date = db.Column(db.Date())
+  join_date = db.Column(db.Date())
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
   class Meta:
@@ -96,14 +96,14 @@ def seed_db():
     email = "admin@email.com",
     password = bcrypt.generate_password_hash("123456").decode("utf-8"),
     admin = True,
-    #join_date = date.today()
+    join_date = date.today()
   )
 
   user1 = User(
     name = "Lumberjack Williams",
     email = "user1@email.com",
     password = bcrypt.generate_password_hash("654321").decode("utf-8"),
-    #join_date = date.today()
+    join_date = date.today()
   )
 
   db.session.add(movie1)
@@ -129,15 +129,22 @@ def get_movies():
 
   return jsonify(result)
 
-@app.route("/auth", methods=["POST"])
+@app.route("/auth/register", methods=["POST"])
 def auth_register():
   #request data loaded in user_schema
   user_fields = user_schema.load(request.json)
+
+  #check if the email exists
+  user = User.query.filter_by(email=user_fields["email"]).first()
+
+  if user:
+    return abort(400, description="Email already registered")
 
   user = User()
   user.name = user_fields["name"]
   user.email = user_fields["email"]
   user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+  user.join_date = date.today()
 
   #add to database and commit change
   db.session.add(user)
