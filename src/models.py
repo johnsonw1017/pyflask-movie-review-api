@@ -11,7 +11,7 @@ class Movie(db.Model):
   title = db.Column(db.String())
   description = db.Column(db.String())
   release_date = db.Column(db.Date())
-  run_time = db.Column(db.Integer())
+  runtime = db.Column(db.Integer())
   #genre = db.Column(db.String()) #depends whether can integrate from csv
 
 class User(db.Model):

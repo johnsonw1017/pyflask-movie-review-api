@@ -3,6 +3,7 @@ from flask import Blueprint
 from main import bcrypt
 from models import Movie, User
 from datetime import date
+import psycopg2
 
 db_commands = Blueprint("db", __name__)
 
@@ -14,19 +15,19 @@ def create_db():
 
 @db_commands.cli.command("seed")
 def seed_db():
-  movie1 = Movie(
-    title = "Toy Story",
-    description = "Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstances separate Buzz and Woody from their owner, the duo eventually learns to put aside their differences.",
-    release_date = "1995-10-30",
-    run_time = 81,
+  conn = psycopg2.connect(
+     dbname = "movie_review_db",
+     user = "db_dev",
+     password = "123456",
+     host = "localhost"
   )
+  cursor = conn.cursor()
 
-  movie2 = Movie(
-    title = "Jumanji",
-    description = "When siblings Judy and Peter discover an enchanted board game that opens the door to a magical world, they unwittingly invite Alan -- an adult who's been trapped inside the game for 26 years -- into their living room. Alan's only hope for freedom is to finish the game, which proves risky as all three find themselves running from giant rhinoceroses, evil monkeys and other terrifying creatures.",
-    release_date = "1995-12-15",
-    run_time = 104,
-  )
+  with open('movies.txt', 'r') as f:
+    cursor.copy_from(f, 'MOVIES', sep='|')
+
+  conn.commit()
+
 
   admin_user = User(
     name = "Johnson Wang",
@@ -43,8 +44,6 @@ def seed_db():
     join_date = date.today()
   )
 
-  db.session.add(movie1)
-  db.session.add(movie2)
   db.session.add(admin_user)
   db.session.add(user1)
   db.session.commit()
