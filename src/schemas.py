@@ -5,7 +5,7 @@ from marshmallow.validate import Length
 class MovieSchema(ma.Schema):
   class Meta:
     #fields that would be exposed
-    fields = ("title", "description", "release_date", "run_time")
+    fields = ("title", "description", "release_date", "runtime")
 
 #for one card retrieval 
 movie_schema = MovieSchema()

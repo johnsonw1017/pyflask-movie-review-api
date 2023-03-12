@@ -3,5 +3,5 @@ venv/
 .flaskenv
 docs/
 movie dataset/
-test.py
 notes.txt
+movies.csv
