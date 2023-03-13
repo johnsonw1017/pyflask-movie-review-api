@@ -3,6 +3,7 @@ import os
 class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.environ.get("SECRET_KEY")
+    JSON_SORT_KEYS = False
     DEBUG = os.environ.get("FLASK_DEBUG") == "1"
     @property
     def SQLALCHEMY_DATABASE_URI(self):

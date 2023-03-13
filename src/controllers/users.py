@@ -9,4 +9,4 @@ def get_user(id):
 
   user = User.query.filter_by(id=id).first()
   
-  return jsonify({"name": user.name, "email": user.email, "join_date": user.join_date})
+  return jsonify(user_schema.dump(user))

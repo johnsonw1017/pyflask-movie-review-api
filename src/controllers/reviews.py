@@ -13,9 +13,7 @@ def get_reviews_movie(movie_id):
   
   reviews = Review.query.filter_by(movie_id=movie_id).order_by(Review.post_date.desc()).limit(10)
 
-  result = reviews_schema.dump(reviews)
-
-  return jsonify(result)
+  return jsonify(reviews_schema.dump(reviews))
 
 #get reviews from users profile (10 most recent)
 @reviews.route("/profile/<int:user_id>/reviews", methods=["GET"])
@@ -23,9 +21,7 @@ def get_reviews_profile(user_id):
   
   reviews = Review.query.filter_by(user_id=user_id).order_by(Review.post_date.desc()).limit(10)
 
-  result = reviews_schema.dump(reviews)
-
-  return jsonify(result)
+  return jsonify(reviews_schema.dump(reviews))
 
 #get individual reviews
 @reviews.route("/reviews/<int:review_id>", methods=["GET"])
@@ -33,9 +29,7 @@ def get_review(review_id):
   
   review = Review.query.filter_by(id=review_id).first()
 
-  result = review_schema.dump(review)
-
-  return jsonify(result)
+  return jsonify(review_schema.dump(review))
 
 #post a review for a movie
 @reviews.route("/movies/<int:movie_id>/reviews", methods=["POST"])
@@ -70,9 +64,8 @@ def create_review(movie_id):
   # add to the database and commit
   db.session.add(new_review)
   db.session.commit()
-  result = review_schema.dump(new_review)
 
-  return jsonify(result)
+  return jsonify(review_schema.dump(new_review))
 
 #delete review
 @reviews.route("/reviews/<int:review_id>", methods=["DELETE"])
@@ -97,9 +90,8 @@ def delete_review(review_id):
   
   db.session.delete(review)
   db.session.commit()
-  result = review_schema.dump(review)
 
-  return jsonify(result)
+  return jsonify(review_schema.dump(review))
 
 @reviews.route("/reviews/<int:review_id>", methods=["PUT"])
 @jwt_required()
@@ -129,6 +121,5 @@ def update_review(review_id):
   review.rating = review_fields["rating"]
 
   db.session.commit()
-  result = review_schema.dump(review)
 
-  return jsonify(result)
+  return jsonify(review_schema.dump(review))
