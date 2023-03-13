@@ -8,5 +8,5 @@ users = Blueprint('users', __name__)
 def get_user(id):
 
   user = User.query.filter_by(id=id).first()
-  result = user_schema.dump(user)
-  return jsonify(result)
+  
+  return jsonify({"name": user.name, "email": user.email, "join_date": user.join_date})

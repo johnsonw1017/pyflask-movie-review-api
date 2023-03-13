@@ -2,7 +2,7 @@ from main import db
 from flask import Blueprint
 from main import bcrypt
 from models import User, Review
-from datetime import date
+from datetime import datetime
 import psycopg2
 
 db_commands = Blueprint("db", __name__)
@@ -34,14 +34,14 @@ def seed_db():
     email = "admin@email.com",
     password = bcrypt.generate_password_hash("123456").decode("utf-8"),
     admin = True,
-    join_date = date.today()
+    join_date = datetime.now()
   )
 
   user1 = User(
     name = "Lumberjack Williams",
     email = "user1@email.com",
     password = bcrypt.generate_password_hash("654321").decode("utf-8"),
-    join_date = date.today()
+    join_date = datetime.now()
   )
 
   db.session.add(admin_user)
@@ -54,7 +54,7 @@ def seed_db():
      rating = 3,
      user = user1,
      movie_id = 8844,
-     post_date = date.today()
+     post_date = datetime.now()
   )
 
   review2 = Review(
@@ -63,7 +63,7 @@ def seed_db():
      rating = 9,
      user = user1,
      movie_id = 862,
-     post_date = date.today()
+     post_date = datetime.now()
   )
   db.session.add(review1)
   db.session.add(review2)
