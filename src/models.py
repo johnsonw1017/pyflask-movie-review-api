@@ -38,5 +38,6 @@ class Review(db.Model):
   title = db.Column(db.String())
   comment = db.Column(db.String())
   rating = db.Column(db.Integer())
+  post_date = db.Column(db.Date())
   user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
   movie_id = db.Column(db.Integer, db.ForeignKey("movies.id"), nullable=False)
