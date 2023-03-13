@@ -2,7 +2,7 @@ from main import db
 
 class Movie(db.Model):
   #table name of db
-  __tablename__ = "MOVIES"
+  __tablename__ = "movies"
 
   #primary key
   id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +15,7 @@ class Movie(db.Model):
   reviews = db.relationship("Review", backref="movie")
 
 class User(db.Model):
-  __tablename__ = "USERS"
+  __tablename__ = "users"
 
   #primary key
   id = db.Column(db.Integer, primary_key=True)
@@ -28,8 +28,8 @@ class User(db.Model):
   join_date = db.Column(db.Date())
   reviews = db.relationship("Review", backref="user")
 
-class Reviews(db.Model):
-  __tablename__ = "REVIEWS"
+class Review(db.Model):
+  __tablename__ = "reviews"
 
   #primary key
   id = db.Column(db.Integer, primary_key=True)

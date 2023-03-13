@@ -1,4 +1,4 @@
-from models import User, Movie
+from models import User
 from main import ma
 from marshmallow.validate import Length
 
@@ -24,3 +24,14 @@ user_schema = UserSchema()
 
 #for multiple cards retrieval
 users_schema = UserSchema(many=True)
+
+class ReviewSchema(ma.Schema):
+  class Meta:
+    #fields that would be exposed
+    fields = ("title", "comment", "rating", "user_id", "movie_id")
+
+#for one card retrieval 
+review_schema = ReviewSchema()
+
+#for multiple cards retrieval
+reviews_schema = ReviewSchema(many=True)
