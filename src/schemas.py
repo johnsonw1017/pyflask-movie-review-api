@@ -28,7 +28,7 @@ users_schema = UserSchema(many=True)
 class ReviewSchema(ma.Schema):
   class Meta:
     #fields that would be exposed
-    fields = ("title", "comment", "rating", "post_date", "user_id", "movie_id")
+    fields = ("title", "comment", "rating", "post_date", "id", "user_id", "movie_id")
 
 #for one card retrieval 
 review_schema = ReviewSchema()
