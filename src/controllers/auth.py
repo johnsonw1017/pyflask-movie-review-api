@@ -44,7 +44,7 @@ def auth_login():
 
     # error if user not exist or password incorrect
     if not user or not bcrypt.check_password_hash(user.password, user_fields["password"]):
-        return abort(401, description="Incorrect username and password")
+        return abort(401, description="Incorrect username or password")
     
     #create access token with 1 day expiry
     expiry = timedelta(days=1)

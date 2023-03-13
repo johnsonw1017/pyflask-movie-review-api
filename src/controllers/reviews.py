@@ -100,3 +100,35 @@ def delete_review(review_id):
   result = review_schema.dump(review)
 
   return jsonify(result)
+
+@reviews.route("/reviews/<int:review_id>", methods=["PUT"])
+@jwt_required()
+def update_review(review_id):
+  user_id  = get_jwt_identity()
+  user = User.query.get(user_id)
+
+  #check if user is in database
+  if not user:
+    return abort(401, description="Invalid user")
+  
+  review = Review.query.filter_by(id=review_id).first()
+
+  #check if review is in database
+  if not review:
+    return abort(400, description= "Review does not exist")
+  
+  #check if user is authorised either the reviewer or an admin user
+  if not (user.admin or user_id == str(review.user_id)):
+    return abort(401, description= "You do not have the required permissions to perform this action")
+  
+  review_fields = review_schema.load(request.json)
+  
+  #only these following fields can be updated/edited, rest will remain the same
+  review.title = review_fields["title"]
+  review.comment = review_fields["comment"]
+  review.rating = review_fields["rating"]
+
+  db.session.commit()
+  result = review_schema.dump(review)
+
+  return jsonify(result)
