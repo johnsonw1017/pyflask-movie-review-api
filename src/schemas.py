@@ -24,6 +24,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
   #validate password length  
   password = ma.String(validate=Length(min=6))
   reviews = fields.List(fields.Nested("ReviewSchema", only=("title", "movie", "rating")))
+
 #for one card retrieval 
 user_schema = UserSchema()
 
