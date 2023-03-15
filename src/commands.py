@@ -75,6 +75,7 @@ def seed_db():
      title = "Movies of December 2003",
      comment = "These are movies released in December 2003",
      post_date = datetime.now(),
+     private = True,
      user = user1
   )
 

@@ -51,7 +51,8 @@ class ListSchema(ma.Schema):
   class Meta:
     #fields that would be exposed
     ordered = True
-    fields = ("id", "title","post_date", "comment", "movies", "user")
+    fields = ("id", "title", "post_date", "comment", "private", "movies", "user")
+    load_only = ("private")
   user = fields.Nested("UserSchema", only=("name", "email"))
   movies = fields.List(fields.Nested("MovieSchema", only=("id", "title", "release_date")))
 

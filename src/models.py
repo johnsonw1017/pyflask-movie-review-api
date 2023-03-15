@@ -57,5 +57,6 @@ class List(db.Model):
   title = db.Column(db.String())
   comment = db.Column(db.String())
   post_date = db.Column(db.Date())
+  private = db.Column(db.Boolean(), default=False)
   user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
   movies = db.relationship("Movie", secondary=movie_list, backref="list")

@@ -11,25 +11,46 @@ lists = Blueprint("lists", __name__)
 @lists.route("/lists", methods=["GET"])
 def get_lists():
   
-  lists = List.query.order_by(List.post_date.desc()).limit(10)
+  lists = List.query.filter_by(private=False).order_by(List.post_date.desc()).limit(10)
 
   return jsonify(lists_schema.dump(lists))
 
 #get lists from users profile (10 most recent)
 @lists.route("/profile/<int:user_id>/lists", methods=["GET"])
+@jwt_required()
 def get_lists_profile(user_id):
-  
-  lists = List.query.filter_by(user_id=user_id).order_by(List.post_date.desc()).limit(10)
+  access_user_id = int(get_jwt_identity())
+  access_user = User.query.get(access_user_id)
+
+  #check if user is in database
+  if not access_user:
+    return abort(401, description="Invalid user")
+
+  if access_user_id == user_id or access_user.admin:
+    lists = List.query.filter_by(user_id=user_id).order_by(List.post_date.desc()).limit(10)
+  else:
+    lists = List.query.filter_by(user_id=user_id, private=False).order_by(List.post_date.desc()).limit(10)
 
   return jsonify(lists_schema.dump(lists))
 
 #get individual lists
 @lists.route("/lists/<int:list_id>", methods=["GET"])
+@jwt_required()
 def get_list(list_id):
-  
+  access_user_id = int(get_jwt_identity())
+  access_user = User.query.get(access_user_id)
+
+  #check if user is in database
+  if not access_user:
+    return abort(401, description="Invalid user")
+
   list = List.query.filter_by(id=list_id).first()
 
-  return jsonify(list_schema.dump(list))
+  if (not list.private) or (list.private and (access_user_id == list.user_id or access_user.admin)):
+    return jsonify(list_schema.dump(list))
+  else:
+    return abort(401, description="You do not have the required permissions to perform this action")
+
 
 #post a list
 @lists.route("/lists", methods=["POST"])
@@ -43,6 +64,7 @@ def create_list():
   new_list = List()
   new_list.title = list_fields["title"]
   new_list.comment = list_fields["comment"]
+  new_list.private = list_fields["private"]
   new_list.user_id = user_id
   new_list.post_date = datetime.now()
 
@@ -78,7 +100,7 @@ def delete_list(list_id):
   if not list:
     return abort(400, description= "list does not exist")
   
-  #check if user is authorised either the lister or an admin user
+  #check if user is authorised either the list maker or an admin user
   if not (user.admin or user_id == str(list.user_id)):
     return abort(401, description= "You do not have the required permissions to perform this action")
   
@@ -103,7 +125,7 @@ def update_list(list_id):
   if not list:
     return abort(400, description= "list does not exist")
   
-  #check if user is authorised either the lister or an admin user
+  #check if user is authorised either the list maker or an admin user
   if not (user.admin or user_id == str(list.user_id)):
     return abort(401, description= "You do not have the required permissions to perform this action")
   
@@ -112,10 +134,11 @@ def update_list(list_id):
   #only these following fields can be updated/edited, rest will remain the same
   list.title = list_fields["title"]
   list.comment = list_fields["comment"]
+  list.private = list_fields["private"]
 
   #empty movies before adding
   list.movies = []
-  
+
   movies = list_fields["movies"]
 
   for movie_object in movies:
