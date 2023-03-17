@@ -8,7 +8,7 @@ class MovieSchema(ma.Schema):
     ordered = True
     #fields that would be exposed
     fields = ("id","title", "description", "release_date", "runtime")
-  reviews = fields.List(fields.Nested("ReviewSchema", only=("user", "rating")))
+  reviews = fields.List(fields.Nested("ReviewSchema", only=("user", "rating"), cascade="all, delete"))
 
 #for one card retrieval 
 movie_schema = MovieSchema()
