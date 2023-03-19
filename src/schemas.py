@@ -7,7 +7,7 @@ class MovieSchema(ma.Schema):
   class Meta:
     ordered = True
     #fields that would be exposed
-    fields = ("id","title", "description", "release_date", "runtime")
+    fields = ("id","title", "description", "release_date", "runtime", "reviews")
   reviews = fields.List(fields.Nested("ReviewSchema", only=("user", "rating"), cascade="all, delete"))
 
 #for one card retrieval 
@@ -20,11 +20,11 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
   class Meta:
     ordered = True
     model = User
-    fields = ("id", "name", "email", "password", "admin", "join_date", "reviews")
+    fields = ("id", "name", "email", "password", "admin", "join_date", "reviews", "lists")
     load_only = ("password", "admin")
   #validate password length  
   password = ma.String(validate=Length(min=6))
-  reviews = fields.List(fields.Nested("ReviewSchema", only=("id", "title", "movie", "rating")))
+  reviews = fields.List(fields.Nested("ReviewSchema", only=("title", "movie", "rating")))
   lists = fields.List(fields.Nested("ListSchema", only=("title",)))
 
 #for one card retrieval 
@@ -52,7 +52,7 @@ class ListSchema(ma.Schema):
     #fields that would be exposed
     ordered = True
     fields = ("id", "title", "post_date", "comment", "private", "movies", "user")
-    load_only = ("private")
+    load_only = ("private",)
   user = fields.Nested("UserSchema", only=("name", "email"))
   movies = fields.List(fields.Nested("MovieSchema", only=("id", "title", "release_date")))
 

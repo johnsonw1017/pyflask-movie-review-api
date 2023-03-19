@@ -4,7 +4,7 @@ from models import User, Movie, Review
 from schemas import movie_schema, movies_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-movies = Blueprint("movies", __name__)
+movies = Blueprint("movies", __name__, url_prefix="/movies")
 
 #get top 10 highest rate movies
 @movies.route("/top-ten-movies", methods=["GET"])
@@ -40,7 +40,7 @@ def get_recent_movies():
   return jsonify(result)
 
 #get movie by id
-@movies.route("/movies/<int:id>", methods=["GET"])
+@movies.route("/<int:id>", methods=["GET"])
 def get_movie(id):
   
   movie = Movie.query.filter_by(id=id).first()
@@ -49,7 +49,7 @@ def get_movie(id):
   return jsonify(result)
 
 #movie title search
-@movies.route("/movies/search", methods=["GET"])
+@movies.route("/search", methods=["GET"])
 def search_movie():
 
   movies_list = [] #in case multiple movies have the same name
@@ -59,7 +59,7 @@ def search_movie():
   return jsonify(result)
 
 #delete movie, admin user only action
-@movies.route("/movies/<int:id>", methods=["DELETE"])
+@movies.route("/<int:id>", methods=["DELETE"])
 @jwt_required()
 def delete_movie(id):
   user_id  = get_jwt_identity()
@@ -82,7 +82,7 @@ def delete_movie(id):
   db.session.delete(movie)
   db.session.commit()
 
-@movies.route("/movies/<int:id>", methods=["PUT"])
+@movies.route("/<int:id>", methods=["PUT"])
 @jwt_required()
 def update_movie(id):
   user_id  = get_jwt_identity()

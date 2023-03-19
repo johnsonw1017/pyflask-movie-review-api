@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, abort
 from main import db, bcrypt
 from models import User
 from schemas import user_schema, users_schema
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from flask_jwt_extended import create_access_token
 
 auth = Blueprint('auth', __name__, url_prefix="/auth")
@@ -23,7 +23,7 @@ def auth_register():
   user.email = user_fields["email"]
   user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
   user.admin = False
-  user.join_date = date.today()
+  user.join_date = datetime.now()
 
   #add to database and commit change
   db.session.add(user)
